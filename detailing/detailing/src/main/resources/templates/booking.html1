@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a Service - Car Detailing</title>
+	<script src="/js/validation.js"></script>
+</head>
+<body>
+    <h2>Book Your Car Detailing Service</h2>
+
+    <!-- Search Bar -->
+    <label for="searchBooking">Search Booking:</label>
+	<input type="text" id="searchBooking" placeholder="Enter booking name or ID">
+	<button onclick="searchBooking()">Search</button>
+    <br><br>
+
+    <!-- Results Section -->
+    <div id="searchResults"></div>
+
+    <!-- Form Section -->
+    <form action="/booking" method="post" id="bookingForm">
+        <label for="customerName">Customer Name:</label>
+        <input type="text" id="customerName" name="customerName" required>
+        <br>
+        
+        <label for="carModel">Car Model:</label>
+        <input type="text" id="carModel" name="carModel" required>
+        <br>
+        
+        <label for="serviceType">Service Type:</label>
+        <select id="serviceType" name="serviceType" required>
+            <option value="basic">Basic Wash</option>
+            <option value="premium">Premium Detail</option>
+            <option value="full-service">Full Service</option>
+        </select>
+        <br>
+        
+        <label for="bookingDate">Booking Date:</label>
+        <input type="datetime-local" id="bookingDate" name="bookingDate" required>
+        <br>
+        
+        <label for="contactNumber">Contact Number:</label>
+        <input type="tel" id="contactNumber" name="contactNumber" required>
+        <br>
+        
+        <label for="address">Address:</label>
+        <textarea id="address" name="address" required></textarea>
+        <br>
+        
+        <button type="submit">Book Now</button>
+    </form>
+</body>
+</html>

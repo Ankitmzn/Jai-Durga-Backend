@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Car Detailing</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="validation.js" defer></script>
+</head>
+<body>
+    <h2>Register for Car Detailing Service</h2>
+	<form action="/register" method="post" id="registerForm" th:action="@{/register}" th:object="${user}">
+
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        
+        <label for="mobile">Mobile Number:</label>
+        <input type="text" id="mobile" name="mobile" required>
+        
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        
+        <button type="submit">Register</button>
+    </form>
+
+    <div>
+        <th:block th:if="${error}">
+            <p style="color:red;" th:text="${error}"></p>
+        </th:block>
+        <th:block th:if="${message}">
+            <p style="color:green;" th:text="${message}"></p>
+        </th:block>
+    </div>
+</body>
+</html>
