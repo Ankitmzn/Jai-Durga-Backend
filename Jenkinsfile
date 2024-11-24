@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/Ankitmzn/Jai-Durga-Backend.git'
+                git branch: 'main', url: 'https://github.com/Ankitmzn/Jai-Durga-Backend.git'
             }
         }
 
