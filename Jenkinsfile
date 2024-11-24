@@ -5,6 +5,7 @@ pipeline {
     environment {
         MAVEN_HOME = 'C:/Program Files/Maven'
         JAVA_HOME = 'C:/Program Files/openjdk-17.0.2_windows-x64_bin/jdk-17.0.2'
+        PATH = "${JAVA_HOME}/bin:${env.PATH}"
         WEBLOGIC_HOME = 'D:/Weblogic/Oracle/Middleware/Oracle_Home'
         DEPLOY_PATH = 'D:/Weblogic/Oracle/Middleware/user_projects/domains/base_domain/servers/AdminServer/tmp/_WL_user'
     }
