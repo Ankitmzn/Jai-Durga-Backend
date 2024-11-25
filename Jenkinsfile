@@ -1,100 +1,77 @@
 pipeline {
     agent any
-
     environment {
-        JAVA_HOME = 'C:/Program Files/openjdk-17.0.2_windows-x64_bin/jdk-17.0.2'
-        MAVEN_HOME = 'C:/Program Files/Maven'
-        PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${env.PATH}"
-        WL_HOME = 'D:/Weblogic/Oracle/Middleware/Oracle_Home'
-        DOMAIN_HOME = 'D:/Weblogic/Oracle/Middleware/Oracle_Home/user_projects/domains/base_domain'
-        WLST_PATH = 'D:/Weblogic/Oracle/Middleware/Oracle_Home/common/bin/wlst.cmd'
-        ADMIN_SERVER_HOST = 'localhost'
-        ADMIN_SERVER_PORT = '7001'
-        MANAGED_SERVER_PORT = '7003'
-        USERNAME = 'weblogic'
-        PASSWORD = 'Highmark@123'
-        APP_PATH = 'path/to/your/war/or/app'
+        MAVEN_HOME = 'C:/Program Files/Maven'  // Path to Maven installation
+        WEBLOGIC_HOME = 'D:/Weblogic/Oracle/Middleware/Oracle_Home'  // Path to WebLogic installation
+        APP_NAME = 'detailing'  // Application name
+        WAR_PATH = 'detailing/detailing/target/detailing-0.0.1-SNAPSHOT.war'  // Path to the WAR file
+        WLST_SCRIPT = 'deploy.py'  // Python script for deployment
+        WL_USERNAME = 'weblogic'  // WebLogic username
+        WL_PASSWORD = 'password'  // WebLogic password
+        WL_HOST = 'localhost'  // WebLogic host
+        WL_PORT = '7001'  // WebLogic port
+        WL_TARGET = 'AdminServer'  // WebLogic target
     }
-
     stages {
         stage('Checkout SCM') {
             steps {
-                echo 'Checking out SCM...'
+                echo 'Checking out code from SCM...'
                 checkout scm
             }
         }
-
         stage('Build Project') {
             steps {
-                script {
-                    echo 'Building project using Maven...'
-                    dir('detailing/detailing') {
-                        bat '"C:/Program Files/Maven/bin/mvn" clean install'
-                    }
+                dir('detailing/detailing') {
+                    echo 'Building the project using Maven...'
+                    bat """
+                        "${MAVEN_HOME}/bin/mvn" clean install
+                    """
                 }
             }
         }
-
         stage('Start Node Manager') {
             steps {
-                script {
-                    echo 'Starting Node Manager...'
-                    timeout(time: 5, unit: 'MINUTES') {
-                        bat """
-                        cd /d D:/Weblogic/Oracle/Middleware/Oracle_Home/user_projects/domains/base_domain/bin
-                        start /b startNodeManager.cmd > nodemanager.log 2>&1
-                        """
-                    }
-                }
+                echo 'Starting Node Manager...'
+                bat """
+                    cd /d ${WEBLOGIC_HOME}/user_projects/domains/base_domain/bin
+                    startNodeManager.cmd
+                """
             }
         }
-
         stage('Deploy to WebLogic') {
             steps {
+                echo 'Deploying application to WebLogic...'
+                // Generate WLST deployment script dynamically
                 script {
-                    echo 'Deploying to WebLogic...'
-                    bat """
-                    ${WLST_PATH} <<EOF
-connect('${USERNAME}', '${PASSWORD}', 't3://${ADMIN_SERVER_HOST}:${ADMIN_SERVER_PORT}')
-deploy('MyNodeApp', '${APP_PATH}', targets='new_ManagedServer_1')
-start('new_ManagedServer_1')
-disconnect()
-exit()
-EOF
+                    writeFile file: "${WLST_SCRIPT}", text: """
+                        connect('${WL_USERNAME}', '${WL_PASSWORD}', 't3://${WL_HOST}:${WL_PORT}')
+                        deploy('${APP_NAME}', '${env.WORKSPACE}/${WAR_PATH}', targets='${WL_TARGET}')
+                        exit()
                     """
                 }
+                // Execute WLST script
+                bat """
+                    cd /d ${WEBLOGIC_HOME}/common/bin
+                    wlst.cmd ${WLST_SCRIPT}
+                """
             }
         }
-
         stage('Verify Deployment') {
             steps {
-                script {
-                    echo 'Verifying deployment...'
-                    bat """
-                    curl http://localhost:${MANAGED_SERVER_PORT}/your_app_endpoint
-                    """
-                }
-            }
-        }
-
-        stage('Stop Node Manager') {
-            steps {
-                script {
-                    echo 'Stopping Node Manager...'
-                    timeout(time: 5, unit: 'MINUTES') {
-                        bat """
-                        cd /d D:/Weblogic/Oracle/Middleware/Oracle_Home/user_projects/domains/base_domain/bin
-                        start /b stopNodeManager.cmd
-                        """
-                    }
-                }
+                echo 'Verifying deployment...'
+                // Add commands to verify if the deployment was successful
+                bat """
+                    curl -I http://${WL_HOST}:${WL_PORT}/${APP_NAME}
+                """
             }
         }
     }
-
     post {
+        always {
+            echo 'Pipeline execution completed.'
+        }
         success {
-            echo 'Build and deployment successful!'
+            echo 'Build and deployment were successful!'
         }
         failure {
             echo 'Build or deployment failed!'
