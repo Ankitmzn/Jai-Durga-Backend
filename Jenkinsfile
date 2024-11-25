@@ -7,7 +7,6 @@ pipeline {
         PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${env.PATH}"
         WL_HOME = 'D:/Weblogic/Oracle/Middleware/Oracle_Home'
         DOMAIN_HOME = 'D:/Weblogic/Oracle/Middleware/Oracle_Home/user_projects/domains/base_domain'
-        NODE_MANAGER_HOME = 'D:/Weblogic/Oracle/Middleware/Oracle_Home/user_projects/domains/base_domain/nodemanager'
         WLST_PATH = 'D:/Weblogic/Oracle/Middleware/Oracle_Home/common/bin/wlst.cmd'
         ADMIN_SERVER_HOST = 'localhost'
         ADMIN_SERVER_PORT = '7001'
@@ -40,14 +39,12 @@ pipeline {
             steps {
                 script {
                     echo 'Starting Node Manager...'
-                    timeout(time: 2, unit: 'MINUTES') {
+                    timeout(time: 5, unit: 'MINUTES') {
                         bat """
-                        cd /d ${NODE_MANAGER_HOME}
-                        start /b startNodeManager.cmd
+                        cd /d D:/Weblogic/Oracle/Middleware/Oracle_Home/user_projects/domains/base_domain/bin
+                        start /b startNodeManager.cmd > nodemanager.log 2>&1
                         """
                     }
-                    echo 'Verifying Node Manager on port 5556...'
-                    bat """netstat -ano | findstr :5556"""
                 }
             }
         }
@@ -76,7 +73,6 @@ EOF
                     bat """
                     curl http://localhost:${MANAGED_SERVER_PORT}/your_app_endpoint
                     """
-                    echo 'Application is running on Managed Server.'
                 }
             }
         }
@@ -85,9 +81,9 @@ EOF
             steps {
                 script {
                     echo 'Stopping Node Manager...'
-                    timeout(time: 2, unit: 'MINUTES') {
+                    timeout(time: 5, unit: 'MINUTES') {
                         bat """
-                        cd /d ${NODE_MANAGER_HOME}
+                        cd /d D:/Weblogic/Oracle/Middleware/Oracle_Home/user_projects/domains/base_domain/bin
                         start /b stopNodeManager.cmd
                         """
                     }
