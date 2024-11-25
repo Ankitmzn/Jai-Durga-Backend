@@ -1,59 +1,54 @@
 pipeline {
     agent any
-    
+
     environment {
-        JAVA_HOME = 'C:/Program Files/openjdk-17.0.2_windows-x64_bin/jdk-17.0.2'  // Adjust with your Java path
-        PATH = "${JAVA_HOME}/bin:${env.PATH}"
+        JAVA_HOME = 'C:/Program Files/Java/jdk-11.0.2'  // Adjust according to your Java path
+        MAVEN_HOME = 'C:/Program Files/Maven'  // Path to Maven
+        PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${env.PATH}"
+        WL_HOME = 'D:/Weblogic/Oracle/Middleware/Oracle_Home'  // Path to WebLogic
+        DOMAIN_HOME = 'D:/Weblogic/Oracle/Middleware/user_projects/domains/base_domain'  // Path to WebLogic Domain
     }
-    
+
     stages {
-        // Stage for checking out the code from Git
         stage('Checkout SCM') {
             steps {
-                checkout scm  // This checks out the code from the Git repository
+                // Checkout code from GitHub
+                checkout scm
             }
         }
 
-        // Stage to check the current directory (for debugging)
-        stage('Check Directory') {
-            steps {
-                script {
-                    bat 'echo %CD%'  // This will print the current directory to the console for debugging
-                }
-            }
-        }
-        
-        // Stage for building the project using Maven
         stage('Build Project') {
             steps {
                 script {
-                    // If the pom.xml is located at the root of the repository, remove the 'dir' block
-                    // If the pom.xml is inside a subdirectory, replace 'path/to/project' with the actual subdirectory name
-                    dir('') {  // This means running in the root directory where pom.xml is located
-                        bat '"C:/Program Files/Maven/bin/mvn" clean install'  // Adjust Maven command if needed
+                    // Navigate to the directory containing the pom.xml (if needed)
+                    dir('path/to/your/project') {  // Replace with your project directory if required
+                        // Build the project using Maven
+                        bat '"C:/Program Files/Maven/bin/mvn" clean install'  // Run Maven build command
                     }
                 }
             }
         }
 
-        // Stage for deploying to WebLogic (this is skipped if earlier stages fail)
         stage('Deploy to WebLogic') {
             steps {
-                echo 'Deploying to WebLogic...'
-                // Add WebLogic deployment steps here
+                script {
+                    // Deploy the artifact to WebLogic
+                    bat """${WL_HOME}/user_projects/domains/base_domain/bin/startWebLogic.cmd"""
+                    // Replace this with your actual WebLogic deployment script, if applicable
+                    bat """${WL_HOME}/user_projects/domains/base_domain/bin/stopWebLogic.cmd"""
+                    // Optionally use WebLogic Deploy Tool or WLST (WebLogic Scripting Tool)
+                    // For simplicity, we're starting/stopping WebLogic as part of the deployment process here.
+                }
             }
         }
     }
 
     post {
-        always {
-            echo 'This will always run after all stages'
-        }
         success {
-            echo 'Deployment succeeded'
+            echo 'Build and deployment successful!'
         }
         failure {
-            echo 'Deployment failed'
+            echo 'Build or deployment failed!'
         }
     }
 }
