@@ -1,7 +1,9 @@
 pipeline {
     agent any
     environment {
-        MAVEN_HOME = 'C:/Program Files/Maven'  // Path to Maven installation
+        JAVA_HOME = 'C:/Program Files/openjdk-17.0.2_windows-x64_bin/jdk-17.0.2'
+        MAVEN_HOME = 'C:/Program Files/Maven'
+        PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${env.PATH}"
         WEBLOGIC_HOME = 'D:/Weblogic/Oracle/Middleware/Oracle_Home'  // Path to WebLogic installation
         APP_NAME = 'detailing'  // Application name
         WAR_PATH = 'detailing/detailing/target/detailing-0.0.1-SNAPSHOT.war'  // Path to the WAR file
