@@ -48,7 +48,7 @@ pipeline {
                 script {
                     try {
                         bat """
-                            powershell -ExecutionPolicy RemoteSigned -File "D:\WeblogicScripts\deploy.ps1"
+                            powershell -ExecutionPolicy RemoteSigned -File "D:/WeblogicScripts/deploy.ps1"
                         """
                     } catch (Exception e) {
                         echo "Error during deployment: ${e.getMessage()}"
