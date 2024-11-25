@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        JAVA_HOME = 'C:/Program Files/Java/jdk-11.0.2'  // Adjust according to your Java path
+        JAVA_HOME = 'C:/Program Files/openjdk-17.0.2_windows-x64_bin/jdk-17.0.2'  // Adjust according to your Java path
         MAVEN_HOME = 'C:/Program Files/Maven'  // Path to Maven
         PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${env.PATH}"
         WL_HOME = 'D:/Weblogic/Oracle/Middleware/Oracle_Home'  // Path to WebLogic
