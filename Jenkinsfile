@@ -1,19 +1,21 @@
 pipeline {
     agent any
+
     environment {
-        JAVA_HOME = 'C:/Program Files/openjdk-17.0.2_windows-x64_bin/jdk-17.0.2'
-        MAVEN_HOME = 'C:/Program Files/Maven'
+        JAVA_HOME = 'C:/Program Files/openjdk-17.0.2_windows-x64_bin/jdk-17.0.2'  // Path to Java
+        MAVEN_HOME = 'C:/Program Files/Maven'  // Path to Maven
         PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${env.PATH}"
         WEBLOGIC_HOME = 'D:/Weblogic/Oracle/Middleware/Oracle_Home'  // Path to WebLogic installation
         APP_NAME = 'detailing'  // Application name
         WAR_PATH = 'detailing/detailing/target/detailing-0.0.1-SNAPSHOT.war'  // Path to the WAR file
         WLST_SCRIPT = 'deploy.py'  // Python script for deployment
         WL_USERNAME = 'weblogic'  // WebLogic username
-        WL_PASSWORD = 'password'  // WebLogic password
+        WL_PASSWORD = 'Highmark@123'  // WebLogic password (corrected)
         WL_HOST = 'localhost'  // WebLogic host
         WL_PORT = '7001'  // WebLogic port
-        WL_TARGET = 'AdminServer'  // WebLogic target
+        WL_TARGET = 'AdminServer'  // WebLogic target server (could also be a managed server)
     }
+
     stages {
         stage('Checkout SCM') {
             steps {
@@ -21,6 +23,7 @@ pipeline {
                 checkout scm
             }
         }
+
         stage('Build Project') {
             steps {
                 dir('detailing/detailing') {
@@ -31,6 +34,7 @@ pipeline {
                 }
             }
         }
+
         stage('Start Node Manager') {
             steps {
                 echo 'Starting Node Manager...'
@@ -40,6 +44,7 @@ pipeline {
                 """
             }
         }
+
         stage('Deploy to WebLogic') {
             steps {
                 echo 'Deploying application to WebLogic...'
@@ -58,6 +63,7 @@ pipeline {
                 """
             }
         }
+
         stage('Verify Deployment') {
             steps {
                 echo 'Verifying deployment...'
@@ -68,6 +74,7 @@ pipeline {
             }
         }
     }
+
     post {
         always {
             echo 'Pipeline execution completed.'
