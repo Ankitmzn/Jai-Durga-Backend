@@ -7,8 +7,8 @@ pipeline {
         PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${env.PATH}"
         GIT_REPO = 'https://github.com/Ankitmzn/Jai-Durga-Backend.git'
         GIT_BRANCH = 'main'
-        WAR_FILE = 'detailing/detailing/target/detailing-0.0.1-SNAPSHOT.war' // Correct WAR file path
-        UPLOAD_DIR = 'D:\\WeblogicScripts\\Upload\\' // Directory for uploading WAR file
+        WAR_FILE = 'detailing/detailing/target/detailing-0.0.1-SNAPSHOT.war' // WAR file path relative to workspace
+        UPLOAD_DIR = 'D:\\WeblogicScripts\\Upload' // Directory for uploading WAR file
         DEPLOY_SCRIPT = 'D:\\WeblogicScripts\\deploy.ps1' // PowerShell script for WebLogic deployment
     }
 
@@ -42,13 +42,14 @@ pipeline {
             }
         }
 
-       stage('Deploy to WebLogic') {
-    steps {
-        echo 'Deploying the WAR file to WebLogic server...'
-        bat 'powershell -File "D:\\WeblogicScripts\\deploy.ps1"'
-    }
-}
-
+        stage('Deploy to WebLogic') {
+            steps {
+                echo 'Deploying the WAR file to WebLogic server...'
+                bat """
+                    powershell -ExecutionPolicy RemoteSigned -File "${DEPLOY_SCRIPT}"
+                """
+            }
+        }
     }
 
     post {
