@@ -7,7 +7,7 @@ pipeline {
         PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${env.PATH}"
         GIT_REPO = 'https://github.com/Ankitmzn/Jai-Durga-Backend.git'
         GIT_BRANCH = 'main'
-        WAR_FILE = 'target/detailing-0.0.1-SNAPSHOT.war'
+         WAR_PATH = 'detailing/detailing/target/detailing-0.0.1-SNAPSHOT.war'  // Path to the WAR file
         DEPLOY_SCRIPT = 'D:\\WeblogicScripts\\deploy.ps1'
     }
 
@@ -18,9 +18,14 @@ pipeline {
             }
         }
 
-        stage('Build WAR') {
+       stage('Build Project') {
             steps {
-                bat 'mvn clean package'
+                dir('detailing/detailing') {
+                    echo 'Building the project using Maven...'
+                    bat """
+                        "${MAVEN_HOME}/bin/mvn" clean install
+                    """
+                }
             }
         }
 
