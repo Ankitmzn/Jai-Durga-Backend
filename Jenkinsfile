@@ -45,9 +45,16 @@ pipeline {
         stage('Deploy to WebLogic') {
             steps {
                 echo 'Deploying the WAR file to WebLogic server...'
-                bat """
-                    powershell -ExecutionPolicy RemoteSigned -File "${DEPLOY_SCRIPT}"
-                """
+                script {
+                    try {
+                        bat """
+                            powershell -ExecutionPolicy RemoteSigned -File "${DEPLOY_SCRIPT}"
+                        """
+                    } catch (Exception e) {
+                        echo "Error during deployment: ${e.getMessage()}"
+                        currentBuild.result = 'FAILURE' // Mark the build as failed if deployment fails
+                    }
+                }
             }
         }
     }
@@ -56,8 +63,14 @@ pipeline {
         always {
             echo 'Pipeline execution completed.'
         }
+        success {
+            echo 'Build and deployment succeeded.'
+        }
         failure {
             echo 'Build or deployment failed.'
+        }
+        cleanup {
+            echo 'Cleaning up resources.'
         }
     }
 }
