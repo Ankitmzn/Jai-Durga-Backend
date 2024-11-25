@@ -45,7 +45,9 @@ pipeline {
         stage('Deploy to WebLogic') {
             steps {
                 echo 'Deploying the WAR file to WebLogic server...'
-                bat "powershell -File \"${DEPLOY_SCRIPT}\""
+                bat """
+                    powershell -ExecutionPolicy RemoteSigned -File "${DEPLOY_SCRIPT}"
+                """
             }
         }
     }
