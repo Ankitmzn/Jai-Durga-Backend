@@ -42,14 +42,13 @@ pipeline {
             }
         }
 
-        stage('Deploy to WebLogic') {
-            steps {
-                echo 'Deploying the WAR file to WebLogic server...'
-                bat """
-                    powershell -ExecutionPolicy RemoteSigned -File "${DEPLOY_SCRIPT}"
-                """
-            }
-        }
+       stage('Deploy to WebLogic') {
+    steps {
+        echo 'Deploying the WAR file to WebLogic server...'
+        bat 'powershell -File "D:\\WeblogicScripts\\deploy.ps1"'
+    }
+}
+
     }
 
     post {
