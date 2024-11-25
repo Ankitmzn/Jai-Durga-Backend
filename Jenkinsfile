@@ -6,7 +6,7 @@ pipeline {
         MAVEN_HOME = 'C:/Program Files/Maven'
         PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${env.PATH}"
         WL_HOME = 'D:/Weblogic/Oracle/Middleware/Oracle_Home'
-        DOMAIN_HOME = 'D:/Weblogic/Oracle/Middleware/user_projects/domains/base_domain'
+        DOMAIN_HOME = 'D:/Weblogic/Oracle/Middleware/Oracle_Home/user_projects/domains/base_domain'
         NODE_MANAGER_HOME = 'D:/Weblogic/Oracle/Middleware/Oracle_Home/user_projects/domains/base_domain/nodemanager'
         WLST_PATH = 'D:/Weblogic/Oracle/Middleware/Oracle_Home/common/bin/wlst.cmd'
         ADMIN_SERVER_HOST = 'localhost'
@@ -14,12 +14,13 @@ pipeline {
         MANAGED_SERVER_PORT = '7003'
         USERNAME = 'weblogic'
         PASSWORD = 'Highmark@123'
-        APP_PATH = 'path/to/your/nodejs/app'
+        APP_PATH = 'path/to/your/war/or/app'
     }
 
     stages {
         stage('Checkout SCM') {
             steps {
+                echo 'Checking out SCM...'
                 checkout scm
             }
         }
@@ -27,6 +28,7 @@ pipeline {
         stage('Build Project') {
             steps {
                 script {
+                    echo 'Building project using Maven...'
                     dir('detailing/detailing') {
                         bat '"C:/Program Files/Maven/bin/mvn" clean install'
                     }
@@ -37,10 +39,14 @@ pipeline {
         stage('Start Node Manager') {
             steps {
                 script {
+                    echo 'Starting Node Manager...'
                     timeout(time: 2, unit: 'MINUTES') {
-                        bat """start /b ${NODE_MANAGER_HOME}/nodemanager.cmd"""
+                        bat """
+                        cd /d ${NODE_MANAGER_HOME}
+                        start /b startNodeManager.cmd
+                        """
                     }
-                    echo "Node Manager started."
+                    echo 'Verifying Node Manager on port 5556...'
                     bat """netstat -ano | findstr :5556"""
                 }
             }
@@ -49,11 +55,16 @@ pipeline {
         stage('Deploy to WebLogic') {
             steps {
                 script {
-                    bat """${WLST_PATH} -url t3://${ADMIN_SERVER_HOST}:${ADMIN_SERVER_PORT} -username ${USERNAME} -password ${PASSWORD} <<EOF
+                    echo 'Deploying to WebLogic...'
+                    bat """
+                    ${WLST_PATH} <<EOF
 connect('${USERNAME}', '${PASSWORD}', 't3://${ADMIN_SERVER_HOST}:${ADMIN_SERVER_PORT}')
 deploy('MyNodeApp', '${APP_PATH}', targets='new_ManagedServer_1')
 start('new_ManagedServer_1')
-EOF"""
+disconnect()
+exit()
+EOF
+                    """
                 }
             }
         }
@@ -61,8 +72,11 @@ EOF"""
         stage('Verify Deployment') {
             steps {
                 script {
-                    bat """curl http://localhost:${MANAGED_SERVER_PORT}/your_app_endpoint"""
-                    echo "Application is running on Managed Server"
+                    echo 'Verifying deployment...'
+                    bat """
+                    curl http://localhost:${MANAGED_SERVER_PORT}/your_app_endpoint
+                    """
+                    echo 'Application is running on Managed Server.'
                 }
             }
         }
@@ -70,7 +84,13 @@ EOF"""
         stage('Stop Node Manager') {
             steps {
                 script {
-                    bat """${NODE_MANAGER_HOME}/stopNodeManager.cmd"""
+                    echo 'Stopping Node Manager...'
+                    timeout(time: 2, unit: 'MINUTES') {
+                        bat """
+                        cd /d ${NODE_MANAGER_HOME}
+                        start /b stopNodeManager.cmd
+                        """
+                    }
                 }
             }
         }
