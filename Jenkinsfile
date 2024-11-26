@@ -42,23 +42,24 @@ pipeline {
             }
         }
 
-       stage('Deploy to WebLogic') {
-    steps {
-        echo 'Deploying the WAR file to WebLogic server...'
-        script {
-            try {
-                timeout(time: 60, unit: 'MINUTES') {
-                    bat """
-                        powershell -ExecutionPolicy RemoteSigned -File "D:/WeblogicScripts/deploy.ps1"
-                    """
+        stage('Deploy to WebLogic') {
+            steps {
+                echo 'Deploying the WAR file to WebLogic server...'
+                script {
+                    try {
+                        timeout(time: 60, unit: 'MINUTES') {
+                            bat """
+                                powershell -ExecutionPolicy RemoteSigned -File "D:/WeblogicScripts/deploy.ps1"
+                            """
+                        }
+                    } catch (Exception e) {
+                        echo "Error during deployment: ${e.getMessage()}"
+                        currentBuild.result = 'FAILURE'
+                    }
                 }
-            } catch (Exception e) {
-                echo "Error during deployment: ${e.getMessage()}"
-                currentBuild.result = 'FAILURE'
             }
         }
     }
-}
 
     post {
         always {
