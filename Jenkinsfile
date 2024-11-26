@@ -17,6 +17,7 @@ pipeline {
             steps {
                 echo 'Checking out the source code...'
                 git branch: "${GIT_BRANCH}", url: "${GIT_REPO}"
+                echo 'Code checkout completed.'
             }
         }
 
@@ -27,6 +28,7 @@ pipeline {
                     bat """
                         "${MAVEN_HOME}\\bin\\mvn" clean install
                     """
+                    echo 'Build completed.'
                 }
             }
         }
@@ -37,7 +39,10 @@ pipeline {
                     echo 'Copying WAR file to the WebLogic upload directory...'
                     def warPath = "${env.WORKSPACE}\\${WAR_FILE}".replaceAll('/', '\\\\')
                     def targetPath = "${UPLOAD_DIR}\\${WAR_FILE.split('/')[-1]}".replaceAll('/', '\\\\')
+                    echo "Source WAR path: ${warPath}"
+                    echo "Target path: ${targetPath}"
                     bat "copy \"${warPath}\" \"${targetPath}\""
+                    echo 'WAR file copied.'
                 }
             }
         }
@@ -48,6 +53,7 @@ pipeline {
                 script {
                     try {
                         timeout(time: 60, unit: 'MINUTES') {
+                            echo 'Running PowerShell deployment script...'
                             bat """
                                 powershell -ExecutionPolicy RemoteSigned -File "D:/WeblogicScripts/deploy.ps1"
                             """
