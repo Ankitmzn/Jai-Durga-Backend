@@ -7,9 +7,9 @@ pipeline {
         PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${env.PATH}"
         GIT_REPO = 'https://github.com/Ankitmzn/Jai-Durga-Backend.git'
         GIT_BRANCH = 'main'
-        WAR_FILE = 'detailing/detailing/target/detailing-0.0.1-SNAPSHOT.war' // WAR file path relative to workspace
-        UPLOAD_DIR = 'D:/Weblogic/Oracle/Middleware/Oracle_Home/user_projects/domains/base_domain/servers/new_ManagedServer_1/stage' // Directory for uploading WAR file
-        DEPLOY_SCRIPT = 'D:\\WeblogicScripts\\deploy.ps1' // PowerShell script for WebLogic deployment
+        WAR_FILE = 'detailing/detailing/target/detailing-0.0.1-SNAPSHOT.war'  // WAR file path relative to workspace
+        UPLOAD_DIR = 'D:/Weblogic/Oracle/Middleware/Oracle_Home/user_projects/domains/base_domain/servers/new_ManagedServer_1/stage'  // Directory for uploading WAR file
+        DEPLOY_SCRIPT = 'D:/WeblogicScripts/deploy.ps1' // PowerShell script for WebLogic deployment
     }
 
     stages {
