@@ -52,7 +52,7 @@ pipeline {
                 echo 'Deploying the WAR file to WebLogic server...'
                 script {
                     try {
-                        timeout(time: 120, unit: 'MINUTES') {
+                        timeout(time: 60, unit: 'MINUTES') {
                             echo 'Running PowerShell deployment script...'
                             bat """
                                 powershell -ExecutionPolicy RemoteSigned -File "D:/WeblogicScripts/deploy.ps1"
